@@ -1,4 +1,4 @@
-// Package zk is a native Go client library for the ZooKeeper orchestration service.
+// package zk is a native Go client library for the ZooKeeper orchestration service.
 package zk
 
 /*

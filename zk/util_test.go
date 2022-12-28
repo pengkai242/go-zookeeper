@@ -3,10 +3,11 @@ package zk
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"fmt"
+	zkCli "github.com/pengkai242/go-zookeeper/zk"
 	"io/ioutil"
-	"strconv"
-	"strings"
 	"testing"
+	"time"
 )
 
 //
@@ -61,29 +62,18 @@ import (
 //}
 
 func TestText(t *testing.T) {
-	str := "Server {\n\norg.apache.zookeeper.server.auth.DigestLoginModule required\n\nuser_beacon_datallink=\"(%@&BEacon39\";\n\n};"
-	t.Log(str)
-	var i int64
-	i = 12343566
-	str1 := strconv.FormatInt(i, 10)
 
-	t.Log(str1)
-	cosUrl := "http://tse-migrate-cd-1306669067.cos.ap-chengdu.myqcloud.com"
-	startIndex := strings.LastIndex(cosUrl, "//")
-	if startIndex == -1 {
-		startIndex = 0
-	} else {
-		startIndex += 2
+	c, _, err := Connect([]string{"14.29.105.178"}, time.Second) //*10)
+	if err != nil {
+		panic(err)
 	}
-	endIndex := strings.LastIndex(cosUrl, ".cos")
-	t.Log(cosUrl[startIndex:endIndex])
-
-	t.Log(MD5File("/Users/pengkan/Downloads/VSCode-darwin-universal.zip"))
-
-	s := "12345/ins-1231/dd.txt"
-	endIndex = len(s)
-	startIndex = strings.LastIndex(s, "/") + 1
-	t.Log(s[startIndex:endIndex])
+	authData := fmt.Sprintf("%s:%s", "admin", "admin")
+	err = c.AddAuth("sasl", []byte(authData))
+	children, _, _, err := c.ChildrenW("/zookeeper")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(children)
 
 }
 func MD5Bytes(s []byte) string {
