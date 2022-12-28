@@ -47,14 +47,14 @@ func TestRecurringReAuthHang(t *testing.T) {
 
 	currentServer := conn.Server()
 	conn.debugCloseRecvLoop = true
-	conn.debugReauthDone = make(chan struct{})
+	//conn.debugReauthDone = make(chan struct{})
 	zkC.StopServer(currentServer)
 	// wait connect to new zookeeper.
 	for conn.Server() == currentServer && conn.State() != StateHasSession {
 		time.Sleep(100 * time.Millisecond)
 	}
 
-	<-conn.debugReauthDone
+	//<-conn.debugReauthDone
 }
 
 func TestSasl2(t *testing.T) {

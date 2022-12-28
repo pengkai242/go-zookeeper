@@ -4,7 +4,6 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
-	zkCli "github.com/pengkai242/go-zookeeper/zk"
 	"io/ioutil"
 	"testing"
 	"time"
@@ -63,11 +62,11 @@ import (
 
 func TestText(t *testing.T) {
 
-	c, _, err := Connect([]string{"14.29.105.178"}, time.Second) //*10)
+	c, _, err := Connect([]string{"127.0.0.1"}, time.Second) //*10)
 	if err != nil {
 		panic(err)
 	}
-	authData := fmt.Sprintf("%s:%s", "admin", "admin")
+	authData := fmt.Sprintf("%s:%s", "", "")
 	err = c.AddAuth("sasl", []byte(authData))
 	children, _, _, err := c.ChildrenW("/zookeeper")
 	if err != nil {
