@@ -1,6 +1,7 @@
 package zk
 
 import (
+	"fmt"
 	"io/ioutil"
 	"testing"
 	"time"
@@ -54,4 +55,18 @@ func TestRecurringReAuthHang(t *testing.T) {
 	}
 
 	<-conn.debugReauthDone
+}
+
+func TestSasl2(t *testing.T) {
+	connectString := "14.22.10.93:12"
+	t.Log(connectString[:])
+	c, _, err := Connect([]string{"14.22.10.93"}, time.Second) //*10)
+	if err != nil {
+		panic(err)
+	}
+	children, stat, err := c.Children("/")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("%+v %+v\n", children, stat)
 }

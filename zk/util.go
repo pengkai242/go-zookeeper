@@ -24,6 +24,13 @@ func WorldACL(perms int32) []ACL {
 	return []ACL{{perms, "world", "anyone"}}
 }
 
+// SaslACL produces an ACL list containing a single ACL which uses the
+// provided permissions, with the scheme "sasl", and ID <user>, which is used
+// by Zookeeper to represent a SASL authenticated user.
+func SaslACL(user string, perms int32) []ACL {
+	return []ACL{{perms, "sasl", user}}
+}
+
 func DigestACL(perms int32, user, password string) []ACL {
 	userPass := []byte(fmt.Sprintf("%s:%s", user, password))
 	h := sha1.New()
@@ -38,12 +45,15 @@ func DigestACL(perms int32, user, password string) []ACL {
 // that resembles <addr>:<port>. If the server has no port provided, the
 // DefaultPort constant is added to the end.
 func FormatServers(servers []string) []string {
-	for i := range servers {
-		if !strings.Contains(servers[i], ":") {
-			servers[i] = servers[i] + ":" + strconv.Itoa(DefaultPort)
+	srvs := make([]string, len(servers))
+	for i, addr := range servers {
+		if strings.Contains(addr, ":") {
+			srvs[i] = addr
+		} else {
+			srvs[i] = addr + ":" + strconv.Itoa(DefaultPort)
 		}
 	}
-	return servers
+	return srvs
 }
 
 // stringShuffle performs a Fisher-Yates shuffle on a slice of strings

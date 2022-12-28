@@ -4,18 +4,22 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/samuel/go-zookeeper/zk"
+	zkcli "github.com/samuel/go-zookeeper/zk"
 )
 
 func main() {
-	c, _, err := zk.Connect([]string{"127.0.0.1"}, time.Second) //*10)
+	//c, _, err := zk.Connect([]string{"14.22.10.93"}, time.Second) //*10)
+	c, _, err := zkcli.Connect([]string{"14.29.105.178"}, time.Second) //*10)
 	if err != nil {
 		panic(err)
 	}
-	children, stat, ch, err := c.ChildrenW("/")
+	authData := fmt.Sprintf("%s:%s", "admin", "admin")
+	err = c.AddAuth("sasl", []byte(authData))
+	children, stat, ch, err := c.ChildrenW("/zookeeper")
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(children)
 	fmt.Printf("%+v %+v\n", children, stat)
 	e := <-ch
 	fmt.Printf("%+v\n", e)

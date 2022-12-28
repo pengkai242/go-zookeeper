@@ -97,7 +97,7 @@ func FLWSrvr(servers []string, timeout time.Duration) ([]*ServerStats, bool) {
 		// within the regex above, these values must be numerical
 		// so we can avoid useless checking of the error return value
 		minLatency, _ := strconv.ParseInt(match[2], 0, 64)
-		avgLatency, _ := strconv.ParseInt(match[3], 0, 64)
+		//avgLatency, _ := strconv.ParseInt(match[3], 0, 64)
 		maxLatency, _ := strconv.ParseInt(match[4], 0, 64)
 		recv, _ := strconv.ParseInt(match[5], 0, 64)
 		sent, _ := strconv.ParseInt(match[6], 0, 64)
@@ -106,11 +106,11 @@ func FLWSrvr(servers []string, timeout time.Duration) ([]*ServerStats, bool) {
 		ncnt, _ := strconv.ParseInt(match[11], 0, 64)
 
 		ss[i] = &ServerStats{
-			Sent:        sent,
-			Received:    recv,
-			NodeCount:   ncnt,
-			MinLatency:  minLatency,
-			AvgLatency:  avgLatency,
+			Sent:       sent,
+			Received:   recv,
+			NodeCount:  ncnt,
+			MinLatency: minLatency,
+			//AvgLatency:  avgLatency,
 			MaxLatency:  maxLatency,
 			Connections: cons,
 			Outstanding: outs,

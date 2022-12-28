@@ -40,7 +40,7 @@ func NewIntegrationTestServer(t *testing.T, configPath string, stdout, stderr io
 	zkPath := os.Getenv("ZOOKEEPER_BIN_PATH")
 	if zkPath == "" {
 		// default to a static reletive path that can be setup with a build system
-		zkPath = "../zookeeper/bin"
+		zkPath = "zookeeper/bin"
 	}
 	if _, err := os.Stat(zkPath); err != nil {
 		if os.IsNotExist(err) {
@@ -49,6 +49,8 @@ func NewIntegrationTestServer(t *testing.T, configPath string, stdout, stderr io
 	}
 	// password is 'test'
 	superString := `SERVER_JVMFLAGS=-Dzookeeper.DigestAuthenticationProvider.superDigest=super:D/InIHSb7yEEbrWz8b9l71RjZJU=`
+	// enable TTL
+	superString += ` -Dzookeeper.extendedTypesEnabled=true -Dzookeeper.emulate353TTLNodes=true`
 
 	return &server{
 		cmdString: filepath.Join(zkPath, "zkServer.sh"),
@@ -65,8 +67,8 @@ func (srv *server) Start() error {
 	srv.cmd = exec.CommandContext(ctx, srv.cmdString, srv.cmdArgs...)
 	srv.cmd.Stdout = srv.stdout
 	srv.cmd.Stderr = srv.stderr
-
 	srv.cmd.Env = srv.cmdEnv
+
 	return srv.cmd.Start()
 }
 
@@ -91,6 +93,7 @@ type ServerConfig struct {
 	AutoPurgeSnapRetainCount int    // Number of snapshots to retain in dataDir
 	AutoPurgePurgeInterval   int    // Purge task internal in hours (0 to disable auto purge)
 	Servers                  []ServerConfigServer
+	AuthProvider             string
 }
 
 func (sc ServerConfig) Marshall(w io.Writer) error {
@@ -129,6 +132,10 @@ func (sc ServerConfig) Marshall(w io.Writer) error {
 	fmt.Fprintln(w, "reconfigEnabled=true")
 	fmt.Fprintln(w, "4lw.commands.whitelist=*")
 
+	if sc.AuthProvider != "" {
+		fmt.Fprintf(w, "authProvider.1=%s\n", sc.AuthProvider)
+	}
+
 	if len(sc.Servers) < 2 {
 		// if we dont have more than 2 servers we just dont specify server list to start in standalone mode
 		// see https://zookeeper.apache.org/doc/current/zookeeperStarted.html#sc_InstallingSingleMode for more details.
@@ -146,6 +153,7 @@ func (sc ServerConfig) Marshall(w io.Writer) error {
 		}
 		fmt.Fprintf(w, "server.%d=%s:%d:%d\n", srv.ID, srv.Host, srv.PeerPort, srv.LeaderElectionPort)
 	}
+
 	return nil
 }
 
